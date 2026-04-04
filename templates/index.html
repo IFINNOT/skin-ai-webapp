@@ -169,7 +169,10 @@
     formData.append("image", file);
 
     try {
-      const res  = await fetch("/predict", { method: "POST", body: formData });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 60000); // 等 60 秒
+      const res = await fetch("/predict", { method: "POST", body: formData, signal: controller.signal });
+      clearTimeout(timeout);
       const data = await res.json();
 
       document.getElementById("result-name").textContent = data.prediction;
@@ -188,7 +191,11 @@
 
       loadHistory();
     } catch (e) {
-      alert("分析失敗，請確認伺服器是否啟動");
+      if (e.name === "AbortError") {
+        alert("伺服器啟動中，請再按一次分析！");
+      } else {
+        alert("分析失敗，請再試一次");
+      }
     }
 
     btn.disabled = false;
