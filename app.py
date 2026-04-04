@@ -49,7 +49,7 @@ transform = transforms.Compose([
 ])
 
 # ========== SQLite 連線 ==========
-DB_PATH = "predictions.db"
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "predictions.db")
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
