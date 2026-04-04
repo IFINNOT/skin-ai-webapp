@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 皮膚病灶辨識</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: sans-serif; background: #f5f7fa; color: #333; }
+
+  .container { max-width: 700px; margin: 40px auto; padding: 20px; }
+
+  h1 { text-align: center; font-size: 26px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #888; margin-bottom: 30px; }
+
+  /* 上傳區 */
+  .upload-area {
+    border: 2px dashed #4a90d9;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .upload-area:hover { background: #eef4ff; }
+  .upload-area p { color: #888; margin-top: 10px; }
+  #file-input { display: none; }
+
+  #preview {
+    display: none;
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    margin: 16px auto 0;
+  }
+
+  /* 按鈕 */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 16px;
+    background: #4a90d9;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn:hover { background: #357abd; }
+  .btn:disabled { background: #aaa; cursor: not-allowed; }
+
+  /* 結果 */
+  .result-card {
+    display: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  .result-title { font-size: 14px; color: #888; margin-bottom: 6px; }
+  .result-name  { font-size: 28px; font-weight: 700; color: #2c3e50; }
+  .result-conf  { font-size: 15px; color: #4a90d9; margin-top: 4px; }
+
+  .bar-section { margin-top: 20px; }
+  .bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 4px;
+    margin-top: 10px;
+  }
+  .bar-bg {
+    background: #eee;
+    border-radius: 4px;
+    height: 10px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: #4a90d9;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+
+  /* 歷史紀錄 */
+  .history-section { margin-top: 32px; }
+  .history-section h2 { font-size: 18px; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px 14px; text-align: left; font-size: 13px; }
+  th { background: #f0f4f8; color: #555; }
+  tr:not(:last-child) td { border-bottom: 1px solid #f0f0f0; }
+
+  .loading { text-align: center; color: #888; padding: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🩺 AI 皮膚病灶辨識</h1>
+  <p class="subtitle">上傳皮膚圖片，AI 自動辨識 7 種病灶類型</p>
+
+  <!-- 上傳區 -->
+  <div class="upload-area" onclick="document.getElementById('file-input').click()">
+    <div style="font-size: 40px;">📷</div>
+    <p>點擊或拖曳圖片至此處</p>
+    <input type="file" id="file-input" accept="image/*">
+    <img id="preview">
+  </div>
+
+  <button class="btn" id="analyze-btn" disabled onclick="analyze()">開始分析</button>
+
+  <!-- 結果卡片 -->
+  <div class="result-card" id="result-card">
+    <div class="result-title">辨識結果</div>
+    <div class="result-name" id="result-name"></div>
+    <div class="result-conf" id="result-conf"></div>
+    <div class="bar-section" id="bar-section"></div>
+  </div>
+
+  <!-- 歷史紀錄 -->
+  <div class="history-section">
+    <h2>📋 歷史紀錄</h2>
+    <table>
+      <thead>
+        <tr><th>時間</th><th>檔案名稱</th><th>辨識結果</th><th>信心度</th></tr>
+      </thead>
+      <tbody id="history-body">
+        <tr><td colspan="4" class="loading">載入中...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // 預覽圖片
+  document.getElementById("file-input").addEventListener("change", function() {
+    const file = this.files[0];
+    if (!file) return;
+    const preview = document.getElementById("preview");
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+    document.getElementById("analyze-btn").disabled = false;
+  });
+
+  // 分析圖片
+  async function analyze() {
+    const file = document.getElementById("file-input").files[0];
+    if (!file) return;
+
+    const btn = document.getElementById("analyze-btn");
+    btn.disabled = true;
+    btn.textContent = "分析中...";
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res  = await fetch("/predict", { method: "POST", body: formData });
+      const data = await res.json();
+
+      document.getElementById("result-name").textContent = data.prediction;
+      document.getElementById("result-conf").textContent = `信心度：${data.confidence}%`;
+      document.getElementById("result-card").style.display = "block";
+
+      // 畫信心度長條
+      const barSection = document.getElementById("bar-section");
+      barSection.innerHTML = "";
+      const sorted = Object.entries(data.all_probs).sort((a, b) => b[1] - a[1]);
+      sorted.forEach(([name, pct]) => {
+        barSection.innerHTML += `
+          <div class="bar-label"><span>${name}</span><span>${pct}%</span></div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>`;
+      });
+
+      loadHistory();
+    } catch (e) {
+      alert("分析失敗，請確認伺服器是否啟動");
+    }
+
+    btn.disabled = false;
+    btn.textContent = "開始分析";
+  }
+
+  // 載入歷史紀錄
+  async function loadHistory() {
+    try {
+      const res  = await fetch("/history");
+      const data = await res.json();
+      const tbody = document.getElementById("history-body");
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="loading">尚無紀錄</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(row => `
+        <tr>
+          <td>${row.created_at}</td>
+          <td>${row.filename}</td>
+          <td>${row.prediction}</td>
+          <td>${row.confidence}%</td>
+        </tr>`).join("");
+    } catch (e) {
+      console.log("歷史紀錄載入失敗");
+    }
+  }
+
+  loadHistory();
+</script>
+</body>
+</html>
