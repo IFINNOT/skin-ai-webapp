@@ -80,7 +80,8 @@ python app.py
 
 ## 📸 截圖
 
-（Week 3 完成後補上）
+
+<img width="892" height="1260" alt="img" src="https://github.com/user-attachments/assets/b978e9fb-fff8-4a17-ac70-4f475ea85f60" />
 
 ---
 
