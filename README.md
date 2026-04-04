@@ -4,7 +4,7 @@
 上傳皮膚圖片，AI 自動辨識 7 種常見病灶類型並顯示信心度。  
 使用 ResNet-18 遷移學習訓練，整合 Flask 後端與 SQLite 資料庫，提供完整的 Web 使用介面。
 
-> 🔗 Live Demo：（部署完成後補上連結）  
+> 🔗 Live Demo：(https://skin-ai-webapp.onrender.com)  
 > 📹 Demo 影片：（錄製完成後補上連結）
 
 ---
