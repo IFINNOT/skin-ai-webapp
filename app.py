@@ -26,12 +26,19 @@ CLASS_INFO  = {
 }
 
 # ========== 載入模型 ==========
-model = models.resnet18(weights=None)
-model.fc = nn.Linear(model.fc.in_features, len(CLASS_NAMES))
-model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
-model.to(DEVICE)
-model.eval()
-print("✅ 模型載入成功")
+_model = None
+
+def get_model():
+    global _model
+    if _model is None:
+        m = models.resnet18(weights=None)
+        m.fc = nn.Linear(m.fc.in_features, len(CLASS_NAMES))
+        m.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
+        m.to(DEVICE)
+        m.eval()
+        _model = m
+        print("✅ 模型載入成功")
+    return _model
 
 # ========== 圖片前處理 ==========
 transform = transforms.Compose([
@@ -83,7 +90,7 @@ def predict():
 
     # 模型推論
     with torch.no_grad():
-        output = model(img_tensor)
+        output = get_model()(img_tensor)
         prob   = torch.nn.functional.softmax(output[0], dim=0)
 
     confidence = prob.max().item()
