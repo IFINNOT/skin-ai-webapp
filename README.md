@@ -2,7 +2,7 @@
 # 🩺 AI 皮膚病灶辨識 Web App
 
 上傳皮膚圖片，AI 自動辨識 7 種常見病灶類型並顯示信心度。  
-使用 ResNet-18 遷移學習訓練，整合 Flask 後端與 MySQL 資料庫，提供完整的 Web 使用介面。
+使用 ResNet-18 遷移學習訓練，整合 Flask 後端與 SQLite 資料庫，提供完整的 Web 使用介面。
 
 > 🔗 Live Demo：（部署完成後補上連結）  
 > 📹 Demo 影片：（錄製完成後補上連結）
@@ -13,7 +13,7 @@
 
 - 上傳皮膚圖片，即時取得 AI 辨識結果
 - 顯示 7 種病灶類別與各類別信心度
-- 歷史查詢紀錄（儲存至 MySQL）
+- 歷史查詢紀錄（儲存至 SQLite）
 - 支援 RWD，手機版面正常顯示
 
 ---
@@ -25,7 +25,7 @@
 | AI 模型 | PyTorch / ResNet-18 Transfer Learning |
 | 後端 | Python Flask |
 | 前端 | HTML / CSS / JavaScript |
-| 資料庫 | MySQL |
+| 資料庫 | SQLite |
 | 部署 | Render |
 
 ---
