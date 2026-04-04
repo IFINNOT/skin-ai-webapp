@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torchvision import models, transforms
 from PIL import Image
-import mysql.connector
+import sqlite3
 import io
 import os
 from datetime import datetime
@@ -41,29 +41,26 @@ transform = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-# ========== MySQL 連線 ==========
+# ========== SQLite 連線 ==========
+DB_PATH = "predictions.db"
+
 def get_db():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="YWxsZW4=",
-        database="skin_ai"
-    )
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def init_db():
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute("""
+    db.execute("""
         CREATE TABLE IF NOT EXISTS predictions (
-            id          INT AUTO_INCREMENT PRIMARY KEY,
-            filename    VARCHAR(255),
-            prediction  VARCHAR(50),
-            confidence  FLOAT,
-            created_at  DATETIME
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            filename    TEXT,
+            prediction  TEXT,
+            confidence  REAL,
+            created_at  TEXT
         )
     """)
     db.commit()
-    cursor.close()
     db.close()
 
 # ========== 路由 ==========
@@ -98,19 +95,17 @@ def predict():
     all_probs = {CLASS_INFO[CLASS_NAMES[i]]: round(prob[i].item() * 100, 1)
                  for i in range(len(CLASS_NAMES))}
 
-    # 寫入 MySQL
+    # 寫入 SQLite
     try:
         db = get_db()
-        cursor = db.cursor()
-        cursor.execute(
-            "INSERT INTO predictions (filename, prediction, confidence, created_at) VALUES (%s, %s, %s, %s)",
-            (filename, class_zh, round(confidence * 100, 1), datetime.now())
+        db.execute(
+            "INSERT INTO predictions (filename, prediction, confidence, created_at) VALUES (?, ?, ?, ?)",
+            (filename, class_zh, round(confidence * 100, 1), datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         )
         db.commit()
-        cursor.close()
         db.close()
     except Exception as e:
-        print(f"MySQL 寫入失敗：{e}")
+        print(f"SQLite 寫入失敗：{e}")
 
     return jsonify({
         "prediction": class_zh,
@@ -122,11 +117,10 @@ def predict():
 def history():
     try:
         db = get_db()
-        cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM predictions ORDER BY created_at DESC LIMIT 20")
-        records = cursor.fetchall()
-        cursor.close()
+        cursor = db.execute("SELECT * FROM predictions ORDER BY created_at DESC LIMIT 20")
+        rows = cursor.fetchall()
         db.close()
+        records = [dict(row) for row in rows]
         return jsonify(records)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
