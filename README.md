@@ -126,6 +126,43 @@ GET /history 顯示歷史查詢紀錄
 
 ---
 
+## 💡 技術選型原因
+
+### 前端：原生 HTML / CSS / JavaScript
+- 不依賴任何框架（React、Vue），減少部署複雜度
+- Flask 可直接用 `render_template` 渲染，不需要前後端分離設定
+- 圖片上傳使用 `FormData` + `fetch` 原生 API，輕量且相容性高
+- 信心度長條圖用純 CSS 動態渲染，不需引入圖表套件
+
+### 後端：Python Flask
+- 輕量級框架，適合單一功能的 AI 推論服務
+- 與 PyTorch 同為 Python 生態，模型可直接在同一進程載入，不需跨語言通訊
+- `@app.route` 快速定義 REST API，開發效率高
+- 相較於 Django 更簡潔，不需要 ORM、Admin 等多餘功能
+
+### AI 框架：PyTorch
+- 業界與學術界主流框架，動態計算圖便於 debug
+- `torchvision.models` 內建 ResNet-18 預訓練權重，可直接載入
+- `torch.no_grad()` 推論時關閉梯度計算，降低記憶體使用
+
+### 模型：ResNet-18
+- 輕量化 CNN 架構，在 Render 免費方案（512MB RAM）可正常運行
+- ImageNet 預訓練權重已學會基礎視覺特徵（邊緣、紋理、顏色），遷移到皮膚圖片效果好
+- 相較於 ResNet-50/101，推論速度更快，適合 Web 即時應用
+
+### 資料庫：SQLite
+- Python 內建，不需額外安裝資料庫服務
+- 本專案查詢量小（單人使用），SQLite 效能完全足夠
+- 部署到 Render 不需設定外部資料庫連線，降低部署複雜度
+- 若未來需要擴展，可輕鬆遷移至 PostgreSQL（只需修改連線字串）
+
+### 部署：Render
+- 支援直接從 GitHub repo 自動部署，推送即更新
+- 免費方案提供公開 HTTPS 網址，可直接用於 Demo
+- 支援 Python / gunicorn，與 Flask 完全相容
+
+---
+
 ## 🗂️ 專案結構
 
 ```
