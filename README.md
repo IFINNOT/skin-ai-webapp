@@ -10,7 +10,8 @@
 
 ## 📸 截圖
 
-（放你的截圖）
+<img width="892" height="1260" alt="img" src="https://github.com/user-attachments/assets/e01c5464-5163-4999-af99-64183265df2f" />
+
 
 ---
 
@@ -195,8 +196,10 @@ skin-ai-webapp/
 | 模型架構 | ResNet-18 |
 | 資料增強 | RandomFlip / RandomRotation / ColorJitter |
 | 類別不平衡處理 | Class Weight |
+<img width="1200" height="400" alt="training_curve" src="https://github.com/user-attachments/assets/c816700a-3441-45ca-abb7-873b053f528a" />
 
 ---
+
 
 ## 🏷️ 辨識類別
 
@@ -209,6 +212,7 @@ skin-ai-webapp/
 | akiec | 光化性角化病 | 228 |
 | vasc | 血管病變 | 99 |
 | df | 皮膚纖維瘤 | 80 |
+<img width="1000" height="500" alt="class_distribution" src="https://github.com/user-attachments/assets/b40e8fef-8717-41fa-baf9-692e7d91c14e" />
 
 ---
 
