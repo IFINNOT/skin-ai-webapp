@@ -213,7 +213,7 @@ skin-ai-webapp/
 | vasc | 血管病變 | 99 |
 | df | 皮膚纖維瘤 | 80 |
 <img width="1000" height="500" alt="class_distribution" src="https://github.com/user-attachments/assets/b40e8fef-8717-41fa-baf9-692e7d91c14e" />
-
+(這張圖是原始資料集的數量，訓練集是切分後的 70%)
 ---
 
 ## 🚀 本機安裝與執行
