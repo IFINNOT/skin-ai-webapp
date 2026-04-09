@@ -4,7 +4,7 @@
 使用 ResNet-18 遷移學習訓練，準確率達 **84.1%**，整合 Flask 後端與 SQLite 資料庫，提供完整的 Web 使用介面。
 
 🔗 **Live Demo**：https://skin-ai-webapp.onrender.com  
-📂 **Dataset**：[HAM10000 - Kaggle](https://www.kaggle.com/datasets/kmader/skin-lesion-analysis-toward-melanoma-detection)
+📂 **Dataset**：[HAM10000 - Kaggle](https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000)
 
 ---
 
